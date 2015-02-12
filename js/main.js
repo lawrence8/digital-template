@@ -1,52 +1,138 @@
-window.onload = function() {
-    // You might want to start with a template that uses GameStates:
-    //     https://github.com/photonstorm/phaser/tree/master/resources/Project%20Templates/Basic
+
+var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'phaser-example', { preload: preload, create: create, update: update });
+
+function preload() {
+
+    game.load.image('4', 'assets/pics/4.jpg');
+	game.load.image('2', 'assets/pics/2.jpg');
+	game.load.image('1', 'assets/pics/1.jpg');
+	game.load.audio('a', 'assets/sound/5.mp3');
+
+}
+
+var sprite;
+var cursors;
+var emitter;
+var text;
+var count;
+var ball;
+
+function create() {
+
+    game.add.image(0, 0, '4');
+	   game.add.image(333, 0, '4');
+	    game.add.image(666, 0, '4');
+		
+		game.add.image(0, 110, '4');
+	   game.add.image(333, 110, '4');
+	    game.add.image(666, 110, '4');
+		
+		game.add.image(0, 220, '4');
+	   game.add.image(333, 220, '4');
+	    game.add.image(666, 220, '4');
+		
+		game.add.image(0, 330, '4');
+	   game.add.image(333, 330, '4');
+	    game.add.image(666, 330, '4');
+		
+	
+
+    game.add.image(0, 440, '4');
+	 game.add.image(333, 440, '4');
+	  game.add.image(666, 440, '4');
+
+	//	Enable p2 physics
+	game.physics.startSystem(Phaser.Physics.P2JS);
+
+    //  Make things a bit more bouncey
+    game.physics.p2.defaultRestitution = 0.8;
+
+    //  Add a sprite
+	sprite = game.add.sprite(300, 500, '2');
+
+    //  Enable if for physics. This creates a default rectangular body.
+	game.physics.p2.enable(sprite);
+
+    //  Modify a few body properties
+	sprite.body.setZeroDamping();
+	sprite.body.fixedRotation = true;
+
+    text = game.add.text(20, 20, 'move with arrow keys', { fill: '#ffffff' });
+	text = game.add.text(20, 50, 'collect at least 40 hearts', { fill: '#ffffff' });
+
+    cursors = game.input.keyboard.createCursorKeys();
+	
+	
+
+   game.physics.startSystem(Phaser.Physics.ARCADE);
+
+    game.physics.arcade.gravity.y = 150;
+	game.time.events.repeat(Phaser.Timer.SECOND * 0.4, 100, createBall, this);
+	
+	
+	count = 0;
+
+    text = game.add.text(700, 40, "Count:0", {
+        font: "20px Arial",
+        fill: "#ff0044",
+        align: "center"
+    });
+
+    text.anchor.setTo(0.5, 0.5);
+	
+	game.physics.p2.enable([ sprite,createBall], true);
+	block.body.onBeginContact.add(blockHit, this);
+}
+
+
+function createBall() {
+
+    //  A bouncey ball sprite just to visually see what's going on.
+
+    ball = game.add.sprite(game.world.randomX, 0, '1');
+
+    game.physics.enable(ball, Phaser.Physics.ARCADE);
+
     
-    // You can copy-and-paste the code from any of the examples at http://examples.phaser.io here.
-    // You will need to change the fourth parameter to "new Phaser.Game()" from
-    // 'phaser-example' to 'game', which is the id of the HTML element where we
-    // want the game to go.
-    // The assets (and code) can be found at: https://github.com/photonstorm/phaser/tree/master/examples/assets
-    // You will need to change the paths you pass to "game.load.image()" or any other
-    // loading functions to reflect where you are putting the assets.
-    // All loading functions will typically all be found inside "preload()".
-    
-    "use strict";
-    
-    var game = new Phaser.Game( 800, 600, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
-    
-    function preload() {
-        // Load an image and call it 'logo'.
-        game.load.image( 'logo', 'assets/phaser.png' );
+    ball.body.collideWorldBounds = false;
+	}
+	
+function update() {
+
+	sprite.body.setZeroVelocity();
+
+    if (cursors.left.isDown)
+    {
+    	sprite.body.moveLeft(400);
     }
-    
-    var bouncy;
-    
-    function create() {
-        // Create a sprite at the center of the screen using the 'logo' image.
-        bouncy = game.add.sprite( game.world.centerX, game.world.centerY, 'logo' );
-        // Anchor the sprite at its center, as opposed to its top-left corner.
-        // so it will be truly centered.
-        bouncy.anchor.setTo( 0.5, 0.5 );
-        
-        // Turn on the arcade physics engine for this sprite.
-        game.physics.enable( bouncy, Phaser.Physics.ARCADE );
-        // Make it bounce off of the world bounds.
-        bouncy.body.collideWorldBounds = true;
-        
-        // Add some text using a CSS style.
-        // Center it in X, and position its top 15 pixels from the top of the world.
-        var style = { font: "25px Verdana", fill: "#9999ff", align: "center" };
-        var text = game.add.text( game.world.centerX, 15, "Build something awesome.", style );
-        text.anchor.setTo( 0.5, 0.0 );
+    else if (cursors.right.isDown)
+    {
+    	sprite.body.moveRight(400);
     }
-    
-    function update() {
-        // Accelerate the 'logo' sprite towards the cursor,
-        // accelerating at 500 pixels/second and moving no faster than 500 pixels/second
-        // in X or Y.
-        // This function returns the rotation angle that makes it visually match its
-        // new trajectory.
-        bouncy.rotation = game.physics.arcade.accelerateToPointer( bouncy, this.game.input.activePointer, 500, 500, 500 );
+
+    if (cursors.up.isDown)
+    {
+    	sprite.body.moveUp(400);
     }
-};
+    else if (cursors.down.isDown)
+    {
+    	sprite.body.moveDown(400);
+    }
+	
+	
+	game.physics.arcade.collide(sprite, ball, collisionHandler,updateText, null, this);
+
+
+}
+function collisionHandler(sprite,ball){
+  remove (ball);
+}
+function updateText() {
+
+    count++;
+
+    text.setText("Count:" + count );
+
+}
+
+
