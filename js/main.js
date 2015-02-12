@@ -16,6 +16,7 @@ var emitter;
 var text;
 var count;
 var ball;
+var a;
 
 function create() {
 
@@ -41,9 +42,12 @@ function create() {
 	 game.add.image(333, 440, '4');
 	  game.add.image(666, 440, '4');
 
+	a = game.add.audio('a');
+	a.volume=0.08;
+	 a.allowMultiple = true;
 	//	Enable p2 physics
 	game.physics.startSystem(Phaser.Physics.P2JS);
-
+	 game.physics.p2.setImpactEvents(true);
     //  Make things a bit more bouncey
     game.physics.p2.defaultRestitution = 0.8;
 
@@ -80,13 +84,19 @@ function create() {
 
     text.anchor.setTo(0.5, 0.5);
 	
-	game.physics.p2.enable([ sprite,createBall], true);
-	block.body.onBeginContact.add(blockHit, this);
+	game.physics.p2.enable([ sprite,createBall], false);
+	sprite.body.onBeginContact.add(blockHit, this);
+	 
 }
 
 
-function createBall() {
 
+
+
+function createBall() {
+	
+   a.play();
+   
     //  A bouncey ball sprite just to visually see what's going on.
 
     ball = game.add.sprite(game.world.randomX, 0, '1');
@@ -97,12 +107,16 @@ function createBall() {
     ball.body.collideWorldBounds = false;
 	}
 	
+	
+	
 function update() {
 
 	sprite.body.setZeroVelocity();
+	
 
     if (cursors.left.isDown)
     {
+	
     	sprite.body.moveLeft(400);
     }
     else if (cursors.right.isDown)
@@ -134,5 +148,6 @@ function updateText() {
     text.setText("Count:" + count );
 
 }
+
 
 
