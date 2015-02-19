@@ -10,144 +10,40 @@ function preload() {
 
 }
 
-var sprite;
-var cursors;
-var emitter;
-var text;
-var count;
-var ball;
-var a;
-
+var platforms;
+ 
 function create() {
-
-    game.add.image(0, 0, '4');
-	   game.add.image(333, 0, '4');
-	    game.add.image(666, 0, '4');
-		
-		game.add.image(0, 110, '4');
-	   game.add.image(333, 110, '4');
-	    game.add.image(666, 110, '4');
-		
-		game.add.image(0, 220, '4');
-	   game.add.image(333, 220, '4');
-	    game.add.image(666, 220, '4');
-		
-		game.add.image(0, 330, '4');
-	   game.add.image(333, 330, '4');
-	    game.add.image(666, 330, '4');
-		
-	
-
-    game.add.image(0, 440, '4');
-	 game.add.image(333, 440, '4');
-	  game.add.image(666, 440, '4');
-
-	a = game.add.audio('a');
-	a.volume=0.08;
-	 a.allowMultiple = true;
-	//	Enable p2 physics
-	game.physics.startSystem(Phaser.Physics.P2JS);
-	 game.physics.p2.setImpactEvents(true);
-    //  Make things a bit more bouncey
-    game.physics.p2.defaultRestitution = 0.8;
-
-    //  Add a sprite
-	sprite = game.add.sprite(300, 500, '2');
-
-    //  Enable if for physics. This creates a default rectangular body.
-	game.physics.p2.enable(sprite);
-
-    //  Modify a few body properties
-	sprite.body.setZeroDamping();
-	sprite.body.fixedRotation = true;
-
-    text = game.add.text(20, 20, 'move with arrow keys', { fill: '#ffffff' });
-	text = game.add.text(20, 50, 'collect at least 40 hearts', { fill: '#ffffff' });
-
-    cursors = game.input.keyboard.createCursorKeys();
-	
-	
-
-   game.physics.startSystem(Phaser.Physics.ARCADE);
-
-    game.physics.arcade.gravity.y = 150;
-	game.time.events.repeat(Phaser.Timer.SECOND * 0.4, 100, createBall, this);
-	
-	
-	count = 0;
-
-    text = game.add.text(700, 40, "Count:0", {
-        font: "20px Arial",
-        fill: "#ff0044",
-        align: "center"
-    });
-
-    text.anchor.setTo(0.5, 0.5);
-	
-	game.physics.p2.enable([ sprite,createBall], false);
-	sprite.body.onBeginContact.add(blockHit, this);
-	 
-}
-
-
-
-
-
-function createBall() {
-	
-   a.play();
-   
-    //  A bouncey ball sprite just to visually see what's going on.
-
-    ball = game.add.sprite(game.world.randomX, 0, '1');
-
-    game.physics.enable(ball, Phaser.Physics.ARCADE);
-
+ 
+    //  We're going to be using physics, so enable the Arcade Physics system
+    game.physics.startSystem(Phaser.Physics.ARCADE);
+ 
+    //  A simple background for our game
+    game.add.sprite(0, 0, 'sky');
+ 
+    //  The platforms group contains the ground and the 2 ledges we can jump on
+    platforms = game.add.group();
+ 
+    //  We will enable physics for any object that is created in this group
+    platforms.enableBody = true;
+ 
+    // Here we create the ground.
+    var ground = platforms.create(0, game.world.height - 64, 'ground');
+ 
+    //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
+    ground.scale.setTo(2, 2);
+ 
+    //  This stops it from falling away when you jump on it
+    ground.body.immovable = true;
+ 
+    //  Now let's create two ledges
+    var ledge = platforms.create(400, 400, 'ground');
+ 
+    ledge.body.immovable = true;
+ 
+    ledge = platforms.create(-150, 250, 'ground');
+ 
+    ledge.body.immovable = true;
     
-    ball.body.collideWorldBounds = false;
-	}
-	
-	
-	
-function update() {
-
-	sprite.body.setZeroVelocity();
-	
-
-    if (cursors.left.isDown)
-    {
-	
-    	sprite.body.moveLeft(400);
-    }
-    else if (cursors.right.isDown)
-    {
-    	sprite.body.moveRight(400);
-    }
-
-    if (cursors.up.isDown)
-    {
-    	sprite.body.moveUp(400);
-    }
-    else if (cursors.down.isDown)
-    {
-    	sprite.body.moveDown(400);
-    }
-	
-	
-	game.physics.arcade.collide(sprite, ball, collisionHandler,updateText, null, this);
-
 
 }
-function collisionHandler(sprite,ball){
-  remove (ball);
-}
-function updateText() {
-
-    count++;
-
-    text.setText("Count:" + count );
-
-}
-
-
 
